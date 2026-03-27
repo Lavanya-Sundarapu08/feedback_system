@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Dashboard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f6f8;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        .card {
+            margin: 10px 0;
+            padding: 10px;
+            background: #e3f2fd;
+            border-radius: 5px;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 10px;
+            width: 100%;
+            background: #1976d2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>Faculty Dashboard</h2>
+
+    <div class="card">
+        Total Responses: <span th:text="${count}"></span>
+    </div>
+
+    <div class="card">
+        Teaching Score: <span id="teachVal" th:text="${teaching}"></span>
+    </div>
+
+    <div class="card">
+        Knowledge Score: <span id="knowVal" th:text="${knowledge}"></span>
+    </div>
+
+    <canvas id="chart"></canvas>
+
+    <a href="/">
+        <button>Back to Home</button>
+    </a>
+
+</div>
+
+<script>
+let teaching = parseFloat(document.getElementById("teachVal").innerText);
+let knowledge = parseFloat(document.getElementById("knowVal").innerText);
+
+new Chart(document.getElementById("chart"), {
+    type: 'bar',
+    data: {
+        labels: ['Teaching', 'Knowledge'],
+        datasets: [{
+            label: 'Average Scores',
+            data: [teaching, knowledge]
+        }]
+    }
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Feedback – EduPulse</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f0ede8;
+    --card: #ffffff;
+    --accent: #c2410c;
+    --accent-light: #fff0eb;
+    --text: #1a1a1a;
+    --muted: #888;
+    --border: #e2ddd8;
+    --step-done: #d4cfc8;
+    --radius: 14px;
+    --green: #16a34a;
+    --blue: #2563eb;
+    --orange: #ea580c;
+    --red: #dc2626;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── NAVBAR ── */
+  .navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 36px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+  .navbar .logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.25rem;
+    letter-spacing: .5px;
+    color: var(--text);
+  }
+  .navbar .staff-btn {
+    font-size: .8rem;
+    font-weight: 500;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 6px 14px;
+    border-radius: 20px;
+    background: white;
+    cursor: pointer;
+  }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 36px;
+    font-size: .82rem;
+    color: var(--muted);
+    background: var(--bg);
+  }
+  .topbar .back-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--text);
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .topbar .sep { color: var(--border); }
+  .topbar .breadcrumb { color: var(--muted); font-size: .8rem; }
+
+  /* ── CONTAINER ── */
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px 24px 60px;
+  }
+
+  /* ── STEPPER ── */
+  .stepper {
+    background: white;
+    border-radius: var(--radius);
+    padding: 18px 28px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    border: 1px solid var(--border);
+  }
+  .stepper-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+  }
+  .stepper-item:last-child { flex: none; }
+  .step-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .75rem;
+    font-weight: 600;
+    background: var(--step-done);
+    color: #888;
+    flex-shrink: 0;
+    border: 2px solid transparent;
+  }
+  .step-circle.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+  .step-circle.locked {
+    background: #f0ede8;
+    color: #ccc;
+    border: 2px dashed #d4cfc8;
+  }
+  .step-label {
+    font-size: .82rem;
+    font-weight: 500;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .step-label.active { color: var(--text); font-weight: 600; }
+  .step-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+    margin: 0 8px;
+  }
+
+  /* ── FACULTY CARD ── */
+  .faculty-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    border: 1px solid var(--border);
+  }
+  .avatar {
+    width: 54px;
+    height: 54px;
+    background: var(--accent);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: white;
+    flex-shrink: 0;
+    font-family: 'DM Serif Display', serif;
+    letter-spacing: .5px;
+  }
+  .faculty-info { flex: 1; }
+  .faculty-info h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.2rem;
+    font-weight: 400;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+  .faculty-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .subject-icon { font-size: .9rem; }
+  .subject-name { font-size: .82rem; color: var(--muted); font-weight: 500; }
+  .tag {
+    font-size: .7rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+  }
+  .tag-theory { background: #fff0eb; color: var(--accent); border: 1px solid #fcd9c8; }
+  .tag-dept   { background: #f0f4ff; color: #2563eb; border: 1px solid #c7d7fd; }
+  .faculty-counter {
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .faculty-counter .num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.4rem;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .faculty-counter .denom {
+    font-size: .75rem;
+    color: var(--muted);
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* ── CRITERIA CARD ── */
+  .criteria-card {
+    background: white;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .criteria-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .criteria-header .label {
+    font-size: .72rem;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+  }
+  .criteria-header .scale-hint {
+    font-size: .72rem;
+    color: #bbb;
+  }
+  .criteria-row {
+    display: flex;
+    align-items: center;
+    padding: 15px 24px;
+    border-bottom: 1px solid #f5f2ef;
+    gap: 16px;
+    transition: background .15s;
+  }
+  .criteria-row:last-child { border-bottom: none; }
+  .criteria-row:hover { background: #faf9f7; }
+  .row-num {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .72rem;
+    font-weight: 600;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .row-text { flex: 1; }
+  .row-title { font-size: .9rem; font-weight: 600; color: var(--text); }
+  .row-sub { font-size: .75rem; color: var(--muted); margin-top: 2px; }
+  .options {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .options input[type="radio"] { display: none; }
+  .options label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 22px;
+    border: 1px solid var(--border);
+    font-size: .78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all .18s;
+    color: var(--muted);
+    white-space: nowrap;
+    background: white;
+  }
+  .options label .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .options label:hover { border-color: #bbb; color: var(--text); }
+
+  /* colour-coded dots */
+  .dot-vg   { background: var(--green); }
+  .dot-g    { background: var(--blue); }
+  .dot-avg  { background: var(--orange); }
+  .dot-blw  { background: var(--red); }
+
+  /* selected states */
+  .options input:checked + label {
+    border-color: transparent;
+    color: white;
+    font-weight: 600;
+  }
+  .opt-vg input:checked + label  { background: var(--green); }
+  .opt-g   input:checked + label { background: var(--blue); }
+  .opt-avg input:checked + label { background: var(--orange); }
+  .opt-blw input:checked + label { background: var(--red); }
+
+  /* ── COMMENT CARD ── */
+  .comment-card {
+    background: white;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+  .comment-card .comment-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 24px 0;
+    font-size: .72rem;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+  }
+  .comment-card .comment-label::before {
+    content: '';
+    width: 3px;
+    height: 14px;
+    background: var(--accent);
+    border-radius: 2px;
+  }
+  .comment-card textarea {
+    width: 100%;
+    border: none;
+    outline: none;
+    resize: vertical;
+    padding: 14px 24px 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .88rem;
+    color: var(--text);
+    background: white;
+    min-height: 110px;
+    line-height: 1.6;
+  }
+  .comment-card textarea::placeholder { color: #ccc; }
+
+  /* ── ACTIONS ── */
+  .actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .cancel-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 20px;
+    border-radius: 24px;
+    border: 1px solid var(--border);
+    background: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .85rem;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .cancel-btn:hover { border-color: #bbb; color: var(--text); }
+  .page-info {
+    font-size: .82rem;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .next-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 13px 24px;
+    border-radius: 24px;
+    border: none;
+    background: var(--accent);
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .15s, transform .1s;
+    letter-spacing: .2px;
+  }
+  .next-btn:hover { background: #a83508; transform: translateY(-1px); }
+  .next-btn:active { transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+  <div class="logo">EduPulse</div>
+  <button class="staff-btn">Staff Login</button>
+</div>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <a class="back-btn" href="#">← Back</a>
+  <span class="sep">·</span>
+  <span class="breadcrumb">Semester III · Electronics (ECE) · Teacher <span th:text="${step}">1</span> of 4</span>
+</div>
+
+<div class="container">
+
+  <!-- STEPPER -->
+  <div class="stepper">
+    <div class="stepper-item">
+      <div th:classappend="${step==1} ? 'active'" class="step-circle">1</div>
+      <span th:classappend="${step==1} ? 'active'" class="step-label">Kumar</span>
+    </div>
+    <div class="step-line"></div>
+    <div class="stepper-item">
+      <div th:classappend="${step==2} ? 'active'" class="step-circle">2</div>
+      <span th:classappend="${step==2} ? 'active'" class="step-label">Rao</span>
+    </div>
+    <div class="step-line"></div>
+    <div class="stepper-item">
+      <div th:classappend="${step==3} ? 'active'" class="step-circle">3</div>
+      <span th:classappend="${step==3} ? 'active'" class="step-label">Patel</span>
+    </div>
+    <div class="step-line"></div>
+    <div class="stepper-item">
+      <div th:classappend="${step==4} ? 'active'" class="step-circle">4</div>
+      <span th:classappend="${step==4} ? 'active'" class="step-label">Sharma</span>
+    </div>
+    <div class="step-line"></div>
+    <div class="stepper-item">
+      <div class="step-circle locked">✕</div>
+      <span class="step-label">Review</span>
+    </div>
+  </div>
+
+  <!-- FACULTY CARD -->
+  <div class="faculty-card">
+    <div class="avatar">AK</div>
+    <div class="faculty-info">
+      <h2>Dr. A. Kumar</h2>
+      <div class="faculty-meta">
+        <span class="subject-icon">🖥️</span>
+        <span class="subject-name">Operating Systems</span>
+        <span class="tag tag-theory">Theory</span>
+        <span class="tag tag-dept">CSE</span>
+      </div>
+    </div>
+    <div class="faculty-counter">
+      <div class="num" th:text="${step}">1</div>
+      <div class="denom">/4 Faculty</div>
+    </div>
+  </div>
+
+  <!-- FORM -->
+  <form action="/next" method="post">
+    <input type="hidden" name="token"    th:value="${token}">
+    <input type="hidden" name="step"     th:value="${step}">
+    <input type="hidden" name="semester" th:value="${semester}">
+    <input type="hidden" name="branch"   th:value="${branch}">
+    <input type="hidden" name="section"  th:value="${section}">
+
+    <!-- CRITERIA CARD -->
+    <div class="criteria-card">
+      <div class="criteria-header">
+        <span class="label">Evaluation Criteria</span>
+        <span class="scale-hint">Very Good · Good · Average · Below Average</span>
+      </div>
+
+      <!-- Row 1 – Teaching Effectiveness -->
+      <div class="criteria-row">
+        <div class="row-num">1</div>
+        <div class="row-text">
+          <div class="row-title">Teaching Effectiveness</div>
+          <div class="row-sub">Clarity, examples, pace</div>
+        </div>
+        <div class="options">
+          <div class="opt-vg">
+            <input type="radio" name="teaching" value="4" id="te4">
+            <label for="te4"><span class="dot dot-vg"></span>Very Good</label>
+          </div>
+          <div class="opt-g">
+            <input type="radio" name="teaching" value="3" id="te3">
+            <label for="te3"><span class="dot dot-g"></span>Good</label>
+          </div>
+          <div class="opt-avg">
+            <input type="radio" name="teaching" value="2" id="te2">
+            <label for="te2"><span class="dot dot-avg"></span>Average</label>
+          </div>
+          <div class="opt-blw">
+            <input type="radio" name="teaching" value="1" id="te1">
+            <label for="te1"><span class="dot dot-blw"></span>Below Average</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 2 – Subject Knowledge -->
+      <div class="criteria-row">
+        <div class="row-num">2</div>
+        <div class="row-text">
+          <div class="row-title">Subject Knowledge</div>
+          <div class="row-sub">Depth &amp; accuracy of content</div>
+        </div>
+        <div class="options">
+          <div class="opt-vg">
+            <input type="radio" name="knowledge" value="4" id="sk4">
+            <label for="sk4"><span class="dot dot-vg"></span>Very Good</label>
+          </div>
+          <div class="opt-g">
+            <input type="radio" name="knowledge" value="3" id="sk3">
+            <label for="sk3"><span class="dot dot-g"></span>Good</label>
+          </div>
+          <div class="opt-avg">
+            <input type="radio" name="knowledge" value="2" id="sk2">
+            <label for="sk2"><span class="dot dot-avg"></span>Average</label>
+          </div>
+          <div class="opt-blw">
+            <input type="radio" name="knowledge" value="1" id="sk1">
+            <label for="sk1"><span class="dot dot-blw"></span>Below Average</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 3 – Communication Skills -->
+      <div class="criteria-row">
+        <div class="row-num">3</div>
+        <div class="row-text">
+          <div class="row-title">Communication Skills</div>
+          <div class="row-sub">Expression, interaction</div>
+        </div>
+        <div class="options">
+          <div class="opt-vg">
+            <input type="radio" name="communication" value="4" id="cs4">
+            <label for="cs4"><span class="dot dot-vg"></span>Very Good</label>
+          </div>
+          <div class="opt-g">
+            <input type="radio" name="communication" value="3" id="cs3">
+            <label for="cs3"><span class="dot dot-g"></span>Good</label>
+          </div>
+          <div class="opt-avg">
+            <input type="radio" name="communication" value="2" id="cs2">
+            <label for="cs2"><span class="dot dot-avg"></span>Average</label>
+          </div>
+          <div class="opt-blw">
+            <input type="radio" name="communication" value="1" id="cs1">
+            <label for="cs1"><span class="dot dot-blw"></span>Below Average</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 4 – Punctuality & Regularity -->
+      <div class="criteria-row">
+        <div class="row-num">4</div>
+        <div class="row-text">
+          <div class="row-title">Punctuality &amp; Regularity</div>
+          <div class="row-sub">Timeliness, class coverage</div>
+        </div>
+        <div class="options">
+          <div class="opt-vg">
+            <input type="radio" name="punctuality" value="4" id="pr4">
+            <label for="pr4"><span class="dot dot-vg"></span>Very Good</label>
+          </div>
+          <div class="opt-g">
+            <input type="radio" name="punctuality" value="3" id="pr3">
+            <label for="pr3"><span class="dot dot-g"></span>Good</label>
+          </div>
+          <div class="opt-avg">
+            <input type="radio" name="punctuality" value="2" id="pr2">
+            <label for="pr2"><span class="dot dot-avg"></span>Average</label>
+          </div>
+          <div class="opt-blw">
+            <input type="radio" name="punctuality" value="1" id="pr1">
+            <label for="pr1"><span class="dot dot-blw"></span>Below Average</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 5 – Student Support -->
+      <div class="criteria-row">
+        <div class="row-num">5</div>
+        <div class="row-text">
+          <div class="row-title">Student Support</div>
+          <div class="row-sub">Availability, doubt clearing</div>
+        </div>
+        <div class="options">
+          <div class="opt-vg">
+            <input type="radio" name="support" value="4" id="ss4">
+            <label for="ss4"><span class="dot dot-vg"></span>Very Good</label>
+          </div>
+          <div class="opt-g">
+            <input type="radio" name="support" value="3" id="ss3">
+            <label for="ss3"><span class="dot dot-g"></span>Good</label>
+          </div>
+          <div class="opt-avg">
+            <input type="radio" name="support" value="2" id="ss2">
+            <label for="ss2"><span class="dot dot-avg"></span>Average</label>
+          </div>
+          <div class="opt-blw">
+            <input type="radio" name="support" value="1" id="ss1">
+            <label for="ss1"><span class="dot dot-blw"></span>Below Average</label>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /criteria-card -->
+
+    <!-- COMMENT -->
+    <div class="comment-card">
+      <div class="comment-label">Personal Comment</div>
+      <textarea name="comment" placeholder="Share specific observations or suggestions for this teacher… (optional)"></textarea>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="actions">
+      <button type="button" class="cancel-btn">✕ Cancel</button>
+      <span class="page-info" th:text="${step} + ' of 4'">1 of 4</span>
+      <button type="submit" class="next-btn">
+        <span th:text="${step < 4} ? 'Next Teacher →' : 'Review →'">Next Teacher →</span>
+      </button>
+    </div>
+
+  </form>
+</div>
+
+</body>
+</html>

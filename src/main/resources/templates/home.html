@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>EduPulse</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: #f3f3f3;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: #f8f6f4;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-box {
+            background: #c2410c;
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .logo-text {
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .login-btn {
+            background: black;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+
+        /* MAIN */
+        .main {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .wrapper {
+            width: 1000px;
+            display: flex;
+            border-radius: 25px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        /* LEFT */
+        .left {
+            width: 50%;
+            padding: 50px;
+            background: linear-gradient(135deg, #1a0f08, #3b1d0f);
+            color: white;
+        }
+
+        .left h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 45px;
+            line-height: 1.2;
+        }
+
+        .left p {
+            margin-top: 20px;
+            color: #d1d5db;
+        }
+
+        .tags {
+            margin-top: 30px;
+        }
+
+        .tag {
+            display: inline-block;
+            border: 1px solid #777;
+            padding: 5px 12px;
+            border-radius: 20px;
+            margin-right: 10px;
+            margin-top: 5px;
+            font-size: 12px;
+        }
+
+        /* RIGHT */
+        .right {
+            width: 50%;
+            background: white;
+            padding: 50px;
+        }
+
+        .right h2 {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .right p {
+            color: gray;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-size: 12px;
+            font-weight: 500;
+            display: block;
+            margin-top: 10px;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            margin-top: 5px;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 25px;
+            padding: 15px;
+            border-radius: 25px;
+            border: none;
+            background: linear-gradient(90deg, #2b160b, #5a2d14);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .note {
+            margin-top: 15px;
+            font-size: 12px;
+            color: #777;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+    <div class="logo">
+        <div class="logo-box">Ep</div>
+        <div class="logo-text">EduPulse</div>
+    </div>
+
+    <div class="login-btn">Staff Login</div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+    <div class="wrapper">
+
+        <!-- LEFT SIDE -->
+        <div class="left">
+            <h1>Faculty<br>Feedback<br>System</h1>
+
+            <p>
+                Help us improve teaching quality by sharing honest,
+                structured feedback on your instructors.
+            </p>
+
+            <div class="tags">
+                <span class="tag">🔒 Anonymous</span>
+                <span class="tag">⚡ 5 min survey</span>
+                <span class="tag">📊 Impacts curriculum</span>
+            </div>
+        </div>
+
+        <!-- RIGHT SIDE -->
+        <div class="right">
+
+            <h2>Student Details</h2>
+            <p>Select your academic details to begin</p>
+
+            <form action="/start" method="post">
+
+                <label>SEMESTER</label>
+                <select name="semester">
+                    <option>Select Semester</option>
+                    <option th:each="s : ${semesters}" th:value="${s}" th:text="${s}"></option>
+                </select>
+
+                <label>BRANCH</label>
+                <select name="branch">
+                    <option>Select Branch</option>
+                    <option th:each="b : ${branches}" th:value="${b}" th:text="${b}"></option>
+                </select>
+
+                <label>SECTION</label>
+                <select name="section">
+                    <option>Select Section</option>
+                    <option th:each="sec : ${sections}" th:value="${sec}" th:text="${sec}"></option>
+                </select>
+
+                <button type="submit">Begin Feedback →</button>
+
+                <div class="note">
+                    ⚠ One submission per semester / branch / section
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
